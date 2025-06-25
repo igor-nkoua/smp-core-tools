@@ -1,3 +1,4 @@
+// src/configs/cache.js
 import redis from 'redis';
 import fs from 'fs';
 import { promisify } from 'util';
@@ -43,22 +44,18 @@ if (!cacheConfig.host) {
   });
 
   function connectionEstablished() {
-    logger.info(
-      `Connected to Redis${useTls ? ' via mTLS' : ''} at ${cacheConfig.host}:${cacheConfig.port}`
-    );
+    logger.info('Connected to Redis at ' + cacheConfig.host + ':' + cacheConfig.port);
   }
 
   function errorThrowing(err) {
-    logger.error(`Redis Client Error at ${cacheConfig.host}:${cacheConfig.port}`, err);
+    logger.error('Redis Client Error at ' + cacheConfig.host + ':' + cacheConfig.port, err);
   }
 
   client.on('error', errorThrowing);
-  client.on('connect', connectionEstablished);
-
-  promiseClient = async () => client.connect();
-  getAsync = promisify(client.get).bind(client);
-  setAsync = promisify(client.set).bind(client);
+  client.on('connect', connectionEstablished) ;
+  promiseClient = async () => client.connect() ;
+  getAsync      = promisify(client.get).bind(client);
+  setAsync      = promisify(client.set).bind(client);
 }
-
-const cache = { client, getAsync, setAsync, promiseClient };
+const cache = { client, getAsync, setAsync, promiseClient }
 export { cache };
